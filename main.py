@@ -4,7 +4,7 @@ import numpy as np
 
 # constants
 NORMALIZE_FACTOR = 255
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 
 # loading the dataset, using tensorflow dataset
 fashion_mnist = tf.keras.datasets.fashion_mnist
@@ -27,7 +27,7 @@ loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
 early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=2, mode='min')
 tensorboard = tf.keras.callbacks.TensorBoard(log_dir='logs', update_freq='batch',
                                              write_graph=False, profile_batch=2)
-save_checkpoints = tf.keras.callbacks.ModelCheckpoint('./checkpints', monitor='val_loss', save_best_only=True,
+save_checkpoints = tf.keras.callbacks.ModelCheckpoint('./checkpints', monitor='loss', save_best_only=True,
                                                       mode='min', save_freq='epoch')
 
 # create model
@@ -44,9 +44,9 @@ model.summary()
 image_generator = tf.keras.preprocessing.image.ImageDataGenerator(horizontal_flip=True, rotation_range=20,
                                                                   width_shift_range=0.1, height_shift_range=0.2)
 
-train_generator = image_generator.flow(x_train, y_train, BATCH_SIZE, seed=2)
+train_generator = image_generator.flow(x_train, y_train, BATCH_SIZE)
 
-r = model.fit(train_generator, steps_per_epoch=x_train.shape[0] // BATCH_SIZE, epochs=10,
+r = model.fit(train_generator, epochs=50,
           validation_data=(x_test, y_test), callbacks=[early_stopping, tensorboard, save_checkpoints])
 
 print(' Training is completed')
